@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password'])) {
             if ($user['status'] === 'suspended') {
                 $error = 'Your account has been suspended';
             } else {
@@ -411,9 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Welcome Back</h1>
         <p class="subtitle">Login to your MentorBridge account</p>
 
-        <?php if ($error): ?>
-            <div class="alert"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
+        
 
         <form method="POST" action="">
             <div class="form-group">

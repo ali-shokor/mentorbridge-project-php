@@ -527,7 +527,7 @@ if (isLoggedIn()) {
     <nav>
         <div class="nav-content">
             <div class="logo">MentorBridge</div>
-            <div class="nav-buttons">
+            <div class="nav-buttons"> 
                 <a href="login.php" class="btn btn-secondary">Login</a>
                 <a href="register.php" class="btn btn-primary">Get Started</a>
             </div>
