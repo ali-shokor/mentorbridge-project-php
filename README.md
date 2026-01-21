@@ -1,597 +1,1397 @@
-# 🎓 MentorBridge - Complete PHP Mentorship Platform
-
-A full-featured mentorship platform connecting students with expert mentors. Built with PHP, MySQLi, and modern UI/UX design with a professional blue color scheme.
-
-## ✨ Features
-
-### For Mentees (Students)
-- 🔍 Browse mentors by category with beautiful cards
-- ⭐ View mentor profiles with ratings and reviews
-- 📅 Book sessions with real-time availability checking
-- 💳 Secure payment processing (20% platform fee)
-- 💬 Leave feedback and ratings after sessions
-- 📊 Track your session history
-- 🎯 View detailed mentor expertise and experience
-
-### For Mentors
-- 📝 Create and manage professional profile
-- 🎯 Set expertise categories (multiple selection)
-- 💰 Set hourly rates (platform adds 20% fee)
-- 🕐 **Dynamic availability management** - Add/remove time slots
-- ⏳ Two-tier approval system:
-  - New mentor → Admin approval → Activate
-  - Profile updates → Re-approval (sessions continue uninterrupted)
-- 📊 **Dual dashboard system**:
-  - **Mentor Dashboard** - Main hub with sessions, earnings, stats
-  - **Profile Editing** - Separate page for profile updates
-- 📅 **Four-state availability system**:
-  - ✅ Available (open for booking)
-  - 📅 Booked (mentee reserved)
-  - ⏳ Waiting for Feedback (session done, no review yet)
-  - 🚫 Disabled (mentor toggled off)
-- 📈 Real-time statistics (total sessions, upcoming, rating, earnings)
-- 💼 Session management with completion marking
-- 🌟 View mentee feedback on completed sessions
-
-### For Admins
-- ✅ **Separated approval workflows**:
-  - New Applications tab (first-time mentors)
-  - Profile Updates tab (existing mentors with edit requests)
-- 👥 Comprehensive user management
-- 📈 Platform-wide statistics dashboard
-- 📊 Monitor all sessions and payments
-- 💰 Track platform revenue (20% of all paid sessions)
-- 🎯 View top mentors by earnings
-- 📋 Session and feedback oversight
-
-## 🚀 Quick Start
-
-### Prerequisites
-- PHP 7.4+ or PHP 8.x
-- MySQL 5.7+ or 8.0+
-- Apache/Nginx web server
-- MySQLi extension enabled
-- phpMyAdmin (optional, for easy database management)
-
-### Installation Steps
-
-#### 1. Create Database
-```sql
-CREATE DATABASE mentorbridge;
-USE mentorbridge;
-
--- Run the complete SQL from database.sql
-```
-
-#### 2. Project Structure
-```
-mentorbridge/
-├── config.php                  # Database & utilities
-├── index.php                   # Landing page
-├── login.php                   # User login
-├── register.php                # User registration (Professional UI)
-├── dashboard.php               # Smart routing
-├── mentor-dashboard.php        # Mentor sessions hub (was mentor-home.php)
-├── mentor-profile.php          # Mentor profile editing (was mentor-dashboard.php)
-├── manage-availability.php     # Availability management
-├── mentee-dashboard.php        # Mentee hub
-├── my-sessions.php             # Mentee session tracking
-├── mentor-detail.php           # Mentor detail view
-├── book-session.php            # Session booking
-├── payment.php                 # Payment processing
-├── admin-dashboard.php         # Admin panel
-├── logout.php                  # Logout
-├── database.sql                # Database schema
-└── uploads/                    # Profile images
-```
-
-#### 3. Configure Database
-Edit `config.php`:
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'mentorbridge');
-define('DB_USER', 'root');        // Your MySQL username
-define('DB_PASS', '');            // Your MySQL password
-```
-
-#### 4. Set Permissions
-```bash
-chmod 777 uploads/
-```
-
-#### 5. Create Admin Account
-Use the database to create an admin user:
-```sql
-INSERT INTO users (email, password, role, status) 
-VALUES ('admin@mentorbridge.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
--- Password: password
-```
-
-#### 6. Access the Application
-Navigate to: `http://localhost/mentorbridge/`
-
-## 📁 Key File Descriptions
-
-### Core Files
-
-**config.php**
-- MySQLi database connection
-- Session management
-- Helper functions (authentication, sanitization)
-- **Note:** Sanitization uses `real_escape_string()` and `strip_tags()` only (no double-encoding)
-- Result cleanup with `result->free()` to prevent sync errors
-
-**index.php**
-- Landing page with animations
-- Hero section with call-to-action
-- Feature showcase
-- Statistics counter
-- Dark/light mode toggle
-
-**register.php**
-- Professional UI with Inter font
-- Role selection (Mentor/Mentee)
-- Email validation
-- Password hashing
-- Platform color scheme (#638ECB blues)
-
-**login.php**
-- User authentication
-- Session creation
-- Role-based redirects
-
-**dashboard.php**
-- Smart routing based on user role and mentor status
-- Approved mentors → mentor-dashboard.php
-- New/pending mentors → mentor-profile.php
-- Mentees → mentee-dashboard.php
-- Admins → admin-dashboard.php
-
-### Mentor Files
-
-**mentor-dashboard.php** (Main Hub - was mentor-home.php)
-- Sessions dashboard for approved mentors only
-- Statistics: Total sessions, upcoming, rating, earnings
-- Upcoming sessions list with "Mark as Completed" button
-- Completed sessions with mentee feedback display
-- Navigation to Profile Editing and Manage Availability
-- Real-time earnings calculation (80% after platform fee)
-
-**mentor-profile.php** (Profile Editing - was mentor-dashboard.php)
-- Profile creation for new mentors
-- Profile editing for approved mentors
-- **Re-approval system**: Changes set status back to 'pending'
-- Shows different messages based on mentor status
-- Default name fallback: "John Doe" if name empty
-- Category selection (multiple)
-- Skills, bio, experience, hourly rate
-- Profile image upload
-- Navigation back to dashboard for approved mentors
-
-**manage-availability.php**
-- Dynamic time slot management
-- Add/remove available time slots
-- **Four-state system**:
-  - Available (green) - Open for booking
-  - Booked (yellow) - Mentee reserved the slot
-  - Waiting for Feedback (amber) - Session completed, no review yet
-  - Disabled (red) - Mentor manually disabled
-- Enhanced query with `LEFT JOIN sessions` and `feedback`
-- Prevents disabling/deleting booked or feedback-pending slots
-- Grouped by day of week
-- Conflict detection (slots must be 1 hour apart)
-### Mentee Files
-
-**mentee-dashboard.php**
-- Category-based mentor browsing
-- Mentor search and filtering
-- Beautiful mentor cards with ratings
-- Quick booking access
-- Search by name/skills
-
-**my-sessions.php**
-- Session history tracking
-- Upcoming sessions display
-- Completed sessions with feedback option
-- Session details (date, time, amount, status)
-- Leave ratings and reviews
-
-**mentor-detail.php**
-- Detailed mentor profile view
-- Full bio and experience display
-- Skills showcase
-- Reviews and ratings section
-- Available time slots display
-- Booking sidebar with rate info
-
-**book-session.php**
-- Session booking processor
-- Availability checking with database queries
-- Prevents double-booking
-- Calculates next available date
-- Creates session record
-- Redirects to payment
-
-**payment.php**
-- Payment processing interface
-- Booking summary display
-- Amount calculation with 20% platform fee
-- Session confirmation
-- Payment status update
-
-### Admin Files
-
-**admin-dashboard.php**
-- **Two separate tabs**:
-  - **New Applications**: First-time mentors (no sessions)
-  - **Profile Updates**: Existing mentors requesting changes (has sessions)
-- Platform statistics (users, mentors, sessions, revenue)
-- Mentor profile details with categories
-- Approve/Reject buttons with different actions:
-  - New: "Approve" / "Reject"
-  - Updates: "Re-Approve" / "Reject Changes"
-- Session count and last updated timestamp for updates
-- Top mentors by earnings
-- Recent sessions overview
-- User management
-
-**logout.php**
-- Session destruction
-- Secure logout
-- Redirect to home
-
-## 🗄️ Database Schema
-
-### Main Tables
-
-**users**
-- User authentication credentials
-- Role assignment (mentor/mentee/admin)
-- Account status (active/suspended)
-- Email and password (hashed)
-
-**mentor_profiles**
-- Mentor information
-- Bio, skills, experience
-- Hourly rate
-- Approval status (pending/approved/rejected)
-- Average rating and rating count
-- Profile image path
-- Created and updated timestamps
-
-**mentee_profiles**
-- Mentee information
-- Full name
-- Interests
-
-**categories**
-- Service categories (Programming, School, University, Biology, etc.)
-- Icons (emojis) and descriptions
-- Used for filtering and organization
-
-**mentor_categories**
-- Many-to-many relationship
-- Links mentors to multiple categories
-
-**mentor_availability**
-- Dynamic availability slots
-- Day of week (Monday-Sunday)
-- Time slot (HH:MM:SS format)
-- Availability flag (enabled/disabled)
-- Created by approved mentors
-
-**sessions**
-- Booked mentorship sessions
-- Scheduling information (date/time)
-- Payment status (pending/paid)
-- Session status (pending/confirmed/completed/cancelled)
-- Amount (mentor rate + 20% platform fee)
-- Links to mentor and mentee
-
-**feedback**
-- Session reviews and ratings
-- Rating (1-5 stars)
-- Comments
-- Timestamps
-- Links to session
-
-## 🎨 Design Features
-
-### Animations
-- ✨ Floating background shapes
-- 📊 Animated statistics counters
-- 🎯 Smooth scroll-based reveals
-- 🎪 Hover effects on cards
-- 🎭 Page transition animations
-- 💫 Slide-down alerts
-- 🔄 Smooth role card selection
-
-### Responsive Design
-- 📱 Mobile-first approach
-- 💻 Tablet optimization
-- 🖥️ Desktop layouts
-- 🔄 Flexible grid systems
-- 📐 Adaptive navigation
-
-### Color Scheme
-```css
-Primary: #638ECB (Professional Blue)
-Primary Dark: #395886 (Deep Blue)
-Primary Light: #8AAEE0 (Light Blue)
-Accent: #B1C9EF (Soft Blue)
-Background Light: #F0F3FA (Very Light Blue)
-Background Lighter: #D5DEEF (Light Blue-Gray)
-```
-
-### Typography
-- Font Family: Inter (Modern, professional sans-serif)
-- Fallback: -apple-system, BlinkMacSystemFont
-- Weight Range: 300-800
-- Optimized for readability
-
-## 🔐 Security Features
-
-✅ **Password Security**
-- `PASSWORD_DEFAULT` hashing (bcrypt)
-- Minimum 6 characters enforced
-- Confirmation validation
-
-✅ **SQL Injection Prevention**
-- MySQLi prepared statements throughout
-- All queries use parameter binding
-- No direct string concatenation
-
-✅ **XSS Protection**
-- `htmlspecialchars()` on all output
-- Only at display time (not in storage)
-
-✅ **Input Sanitization**
-- `sanitize()` function using `real_escape_string()` and `strip_tags()`
-- Trim whitespace
-- No double-encoding issues
-
-✅ **Session Security**
-- Secure session management
-- Role-based access control
-- Login requirement enforcement
-
-✅ **Database Connection**
-- MySQLi with proper error handling
-- UTF-8 character set
-- Result cleanup with `result->free()` to prevent sync errors
-
-✅ **File Upload Security**
-- Extension whitelist (jpg, jpeg, png, gif)
-- Unique filename generation
-- Upload directory isolation
-
-## 🧪 Testing Scenarios
-
-### Registration Flow
-1. Register as mentor with profile completion
-2. Register as mentee with interests
-3. Test validation errors (password mismatch, email duplicate)
-4. Test role card selection
-
-### Mentor Workflow
-1. **New Mentor**:
-   - Complete profile in mentor-profile.php
-   - Upload profile image
-   - Select multiple categories
-   - Check "pending" status banner
-   - Wait for admin approval
-
-2. **Approved Mentor**:
-   - Redirected to mentor-dashboard.php (sessions hub)
-   - Add availability slots in manage-availability.php
-   - View session statistics
-   - Mark sessions as completed
-   - View mentee feedback
-
-3. **Profile Editing**:
-   - Click "Profile Editing" button
-   - Edit profile in mentor-profile.php
-   - Status changes to "pending" (re-approval)
-   - Sessions continue uninterrupted
-   - Shows in admin "Profile Updates" tab
-
-4. **Availability Management**:
-   - Add time slots by day/time
-   - View four states: Available/Booked/Waiting/Disabled
-   - Cannot disable booked slots
-   - Cannot delete slots awaiting feedback
-
-### Mentee Workflow
-1. Browse categories
-2. Search mentors by name/skills
-3. View mentor details with reviews
-4. Check available time slots
-5. Book session
-6. Process payment (with 20% platform fee)
-7. View session in my-sessions.php
-8. Leave feedback after completion
-
-### Admin Workflow
-1. **New Applications Tab**:
-   - View first-time mentor applications
-   - See full profile details
-   - Approve or reject
-   - Creates availability slots on approval
-
-2. **Profile Updates Tab**:
-   - View existing mentors with changes
-   - See "UPDATE REQUEST" badge
-   - View session count
-   - Re-approve or reject changes
-   - Mentors keep existing sessions
-
-3. **Statistics**:
-   - Monitor platform metrics
-   - Track revenue (20% of paid sessions)
-   - View top mentors
-   - Review recent sessions
-
-## 🔧 Recent Updates & Features
-
-### Version 2.0 - Major Workflow Overhaul
-✅ Separated mentor dashboards (profile editing vs sessions)
-✅ Renamed files for clarity:
-   - `mentor-home.php` → `mentor-dashboard.php` (sessions hub)
-   - `mentor-dashboard.php` → `mentor-profile.php` (editing)
-✅ Smart routing in dashboard.php based on approval status
-✅ Two-tier admin approval system
-✅ Four-state availability system
-✅ MySQLi query optimization with result cleanup
-✅ Fixed comma encoding issues
-✅ Professional register page UI
-✅ Removed development/debug utilities
-
-### Platform Fee System
-- Mentee pays: Mentor Rate × 1.20
-- Mentor earns: Mentee Payment ÷ 1.20
-- Platform earns: 20% of all paid sessions
-- Transparent calculation displayed to both parties
-
-### Availability Intelligence
-- Database queries detect actual bookings vs manual disables
-- LEFT JOIN with sessions and feedback tables
-- Prevents mentor from disabling booked slots
-- Shows "Waiting for Feedback" for completed sessions without reviews
-- Real-time availability checking
-
-## 🐛 Bug Fixes
-
-✅ **MySQLi "Commands out of sync" errors**
-- Added `result->free()` calls after all `get_result()` operations
-- Proper query cleanup before next query
-
-✅ **Comma encoding in database**
-- Removed `htmlspecialchars()` from sanitize() function
-- Only escape at display time, not storage
-
-✅ **Availability status confusion**
-- Enhanced queries to distinguish booked vs disabled
-- Four-state system with clear visual indicators
-
-✅ **Profile editing interrupting sessions**
-- Re-approval system keeps mentor active during review
-- Sessions continue without interruption
-
-## 🔮 Future Enhancements
-## 🔮 Future Enhancements
-
-- [ ] Real-time chat between mentor and mentee
-- [ ] Email notifications (booking confirmations, reminders)
-- [ ] Calendar integration (Google Calendar, iCal)
-- [ ] Video call integration (Zoom, Google Meet)
-- [ ] Advanced search filters (rating, price range, availability)
-- [ ] Session rescheduling functionality
-- [ ] Refund system for cancelled sessions
-- [ ] Multi-language support
-- [ ] Mobile app (React Native)
-- [ ] Mentor portfolio/achievement badges
-- [ ] Recurring session bookings
-- [ ] Group mentorship sessions
-- [ ] Mentor certification system
-- [ ] Analytics dashboard for mentors
-- [ ] Payment gateway integration (Stripe/PayPal)
-
-## 📊 Project Statistics
-
-- **Total Files**: 15+ PHP files
-- **Database Tables**: 8 main tables
-- **User Roles**: 3 (Admin, Mentor, Mentee)
-- **Availability States**: 4 (Available, Booked, Waiting, Disabled)
-- **Color Scheme**: Professional Blue (#638ECB)
-- **Framework**: Vanilla PHP with MySQLi
-- **Authentication**: Session-based with role management
-
-## 🤝 Contributing
-
-This is a complete mentorship platform ready for deployment. To customize:
-
-1. **Add Categories**: Insert into `categories` table
-2. **Modify Colors**: Update CSS variables in each file
-3. **Add Features**: Follow existing code patterns
-4. **Payment Integration**: Replace `payment.php` logic
-5. **Email System**: Add SMTP configuration
-
-## 📝 License
-
-This project is open source and available for educational and commercial use.
-
-## 🙏 Acknowledgments
-
-- Built with modern PHP best practices
-- MySQLi for secure database operations
-- Inter font family for professional typography
-- Responsive design for all device sizes
-- Security-first approach throughout
-
-## 📞 Support
-
-For issues or questions:
-1. Check the database schema in `database.sql`
-2. Verify MySQLi extension is enabled
-3. Ensure `uploads/` folder has write permissions
-4. Check PHP error logs for detailed error messages
-
-## 🎯 Key Differentiators
-
-✅ **Separated Workflows**: Clear distinction between profile editing and session management
-✅ **Smart Approval System**: Re-approval doesn't interrupt active sessions
-✅ **Intelligent Availability**: System knows difference between booked and disabled slots
-✅ **Platform Fee Integration**: Transparent 20% fee calculation
-✅ **Professional Design**: Consistent blue color scheme throughout
-✅ **Security Focused**: MySQLi prepared statements, proper sanitization
-✅ **User-Friendly**: Clear navigation, status indicators, helpful messages
+# MentorBridge - Online Mentoring Platform
+
+## Project Overview
+
+**MentorBridge** is a comprehensive web-based mentorship platform that connects students (mentees) with experienced mentors across various academic and professional fields. The platform facilitates knowledge sharing, skill development, and personalized learning through one-on-one mentoring sessions.
+
+### Main Goals and Features
+
+#### Core Objectives
+- **Connect Learners with Experts**: Enable mentees to discover and book sessions with qualified mentors in diverse categories
+- **Empower Mentors**: Provide mentors with tools to offer expertise, manage schedules, and earn income
+- **Ensure Quality**: Admin oversight for mentor approval and platform management
+- **Facilitate Learning**: Structured session booking, scheduling, and feedback system
+
+#### Key Features
+
+**For Mentees:**
+- Browse mentors by categories (Programming, Mathematics, Business, Sciences, etc.)
+- View detailed mentor profiles with ratings, reviews, and hourly rates
+- Book sessions based on mentor availability
+- Secure payment processing with transparent pricing
+- Rate and review completed sessions
+- Track upcoming and past sessions
+
+**For Mentors:**
+- Create comprehensive profiles showcasing skills and experience
+- Set custom hourly rates
+- Manage weekly availability with flexible time slots
+- Accept/view session bookings
+- Track earnings and session history
+- Receive ratings and feedback
+
+**For Administrators:**
+- Approve or reject mentor applications
+- Manage users (suspend, activate accounts)
+- Oversee platform operations
+- Monitor session activity
+- View platform statistics
+
+#### Business Model
+- Mentees pay mentor's hourly rate + 20% platform fee
+- Mentors receive their full hourly rate
+- Platform retains 20% service fee
 
 ---
 
-**MentorBridge** - Connecting knowledge seekers with expert mentors 🎓✨
- Social media login (OAuth)
- Analytics dashboard
- Promotional codes/discounts
- Subscription plans for mentees
-📞 Support
-For issues or questions:
+## Technologies Used
 
-Check database connection in config.php
-Verify file permissions on uploads/
-Check PHP error logs
-Ensure all SQL tables are created
-Verify PHP version (7.4+ required)
-📄 License
-This is a demo/educational project. Feel free to modify and use as needed.
+### Backend
+- **PHP 7.4+** - Server-side scripting and business logic
+- **MySQL/MariaDB** - Relational database management
+- **MySQLi Extension** - Database connectivity with prepared statements
 
-👥 Contributing
-Feel free to fork and improve! Suggested areas:
+### Frontend
+- **HTML5** - Semantic structure and content
+- **CSS3** - Responsive styling with modern animations
+- **JavaScript** - Client-side interactivity and form validation
 
-Payment gateway integration
-Real-time features
-Advanced search
-Mobile optimization
-Performance improvements
-🎉 Quick Test Commands
-Create Admin User (via phpMyAdmin or MySQL CLI):
+### External Resources
+- **Google Fonts (Inter)** - Modern typography
 
-sql
--- Password is 'admin123'
-INSERT INTO users (email, password, role, status) VALUES 
-('admin@test.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active');
-Approve All Pending Mentors:
+### Development Environment
+- **XAMPP** - Local development stack (Apache + MySQL + PHP)
+- **Apache Web Server** - HTTP server (port 80)
+- **PhpMyAdmin** - Database administration interface
 
-sql
-UPDATE mentor_profiles SET status = 'approved' WHERE status = 'pending';
-View All Sessions:
+---
 
-sql
-SELECT s.id, m.full_name as mentor, me.full_name as mentee, s.scheduled_at, s.status 
-FROM sessions s
-JOIN mentor_profiles m ON s.mentor_id = m.id  
-JOIN mentee_profiles me ON s.mentee_id = me.id
-ORDER BY s.scheduled_at DESC;
-Built with ❤️ for education and mentorship
+## Prerequisites
 
-🚀 Happy Coding!
+Before installing and running MentorBridge, ensure you have the following installed on your system:
 
+### Required Software
+
+1. **XAMPP (Version 7.4 or higher)**
+   - **Download**: [https://www.apachefriends.org/](https://www.apachefriends.org/)
+   - **Includes**: Apache 2.4+, MySQL 5.7+, PHP 7.4+
+   - **Supported OS**: Windows, macOS, Linux
+   - **Required Components**: Apache and MySQL modules
+
+2. **Web Browser (Modern)**
+   - Google Chrome (recommended, version 90+)
+   - Mozilla Firefox (version 88+)
+   - Microsoft Edge (version 90+)
+   - Safari (version 14+)
+
+3. **Text Editor/IDE (Optional, for code review)**
+   - Visual Studio Code (recommended)
+   - Sublime Text
+   - Notepad++
+   - PhpStorm
+
+### System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| Operating System | Windows 7/macOS 10.13/Ubuntu 18.04 | Windows 10+/macOS 11+/Ubuntu 20.04+ |
+| RAM | 2 GB | 4 GB or higher |
+| Disk Space | 500 MB free | 1 GB or higher |
+| PHP Version | 7.4 | 8.0 or 8.1 |
+| MySQL Version | 5.7 | 8.0 or MariaDB 10.5+ |
+| Network | Internet connection for Google Fonts | Stable broadband connection |
+
+### PHP Extensions Required
+The following PHP extensions must be enabled (included by default in XAMPP):
+- `mysqli` - MySQL database connectivity
+- `pdo_mysql` - PDO database support
+- `session` - Session management
+- `mbstring` - Multibyte string handling
+- `fileinfo` - File upload handling
+
+---
+
+## Installation & Setup
+
+Follow these detailed step-by-step instructions to set up MentorBridge on your local machine.
+
+### Step 1: Install XAMPP
+
+1. **Download XAMPP**
+   - Visit [https://www.apachefriends.org/](https://www.apachefriends.org/)
+   - Select the appropriate installer for your operating system
+   - Download XAMPP version 7.4 or higher
+
+2. **Run the Installer**
+   - Execute the downloaded installer
+   - **Windows**: Run as Administrator
+   - **macOS/Linux**: Grant necessary permissions
+   
+3. **Installation Options**
+   - Install Location: Use default (`C:\xampp` on Windows, `/Applications/XAMPP` on macOS)
+   - Components: Ensure **Apache** and **MySQL** are selected
+   - Complete the installation wizard
+
+4. **Verify Installation**
+   - Open XAMPP Control Panel
+   - Start Apache (should show "Running" in green)
+   - Start MySQL (should show "Running" in green)
+
+### Step 2: Download/Clone the Project
+
+**Option A: If Project is Already in Place**
+```
+Current location: C:\Users\Invader\Desktop\Programs\Xampp\htdocs\mentorbridge-project-php
+```
+No action needed - proceed to Step 3.
+
+**Option B: Manual Setup (For New Installation)**
+
+1. **Copy Project Files**
+   - Copy the `mentorbridge-project-php` folder
+   - Paste into XAMPP's `htdocs` directory
+   - **Windows**: `C:\xampp\htdocs\`
+   - **macOS**: `/Applications/XAMPP/htdocs/`
+   - **Linux**: `/opt/lampp/htdocs/`
+
+2. **Verify Project Location**
+   ```
+   Final path should be: [XAMPP_ROOT]/htdocs/mentorbridge-project-php/
+   ```
+
+3. **Check File Permissions (Linux/macOS only)**
+   ```bash
+   chmod -R 755 /opt/lampp/htdocs/mentorbridge-project-php
+   chmod -R 777 /opt/lampp/htdocs/mentorbridge-project-php/uploads
+   ```
+
+### Step 3: Configure the Database
+
+1. **Start XAMPP Services**
+   - Open XAMPP Control Panel
+   - Click **Start** next to Apache
+   - Click **Start** next to MySQL
+   - Verify both show "Running" status
+
+2. **Access PhpMyAdmin**
+   - Open your web browser
+   - Navigate to: `http://localhost/phpmyadmin`
+   - You should see the PhpMyAdmin interface
+
+3. **Import Database Schema**
+   
+   **Method 1: Using PhpMyAdmin GUI (Recommended)**
+   - In PhpMyAdmin, click on the **"Import"** tab in the top menu
+   - Click **"Choose File"** button
+   - Navigate to: `mentorbridge-project-php/database.sql`
+   - Select the file and click **"Open"**
+   - Scroll down and click **"Go"** button
+   - Wait for success message: "Import has been successfully finished"
+
+   **Method 2: Using SQL Tab**
+   - In PhpMyAdmin, click on the **"SQL"** tab
+   - Open `database.sql` in a text editor
+   - Copy all the SQL code
+   - Paste into the SQL query box
+   - Click **"Go"** button
+
+4. **Verify Database Creation**
+   - In PhpMyAdmin left sidebar, you should see a database named: `mentorbridge`
+   - Click on it to expand
+   - Verify the following tables exist:
+     - `users`
+     - `mentor_profiles`
+     - `mentee_profiles`
+     - `categories`
+     - `mentor_categories`
+     - `sessions`
+     - `mentor_availability`
+     - `feedback`
+     - `time_slots` (deprecated)
+
+5. **Verify Sample Data**
+   - Click on `users` table
+   - Click **"Browse"** tab
+   - You should see 3 sample users:
+     - Admin: `admin@mentorbridge.com`
+     - Mentor: `john.mentor@example.com`
+     - Mentee: `jane.student@example.com`
+   - Click on `categories` table
+   - You should see 10 categories (Programming, School, University, etc.)
+
+### Step 4: Configure Application Settings
+
+1. **Database Configuration**
+   - Open `config.php` in a text editor
+   - Verify the database credentials (default values should work):
+   ```php
+   define('DB_HOST', 'localhost');
+   define('DB_NAME', 'mentorbridge');
+   define('DB_USER', 'root');
+   define('DB_PASS', '');  // Empty password for XAMPP default
+   ```
+
+2. **Custom Configuration (If Needed)**
+   - If you changed MySQL root password during XAMPP installation:
+     - Update `DB_PASS` with your MySQL password
+   - If using a different MySQL port:
+     - Update `DB_HOST` to `localhost:PORT` (e.g., `localhost:3307`)
+
+### Step 5: Create Uploads Directory
+
+The `uploads/` directory should already exist. If not:
+
+**Windows:**
+```cmd
+mkdir C:\xampp\htdocs\mentorbridge-project-php\uploads
+```
+
+**macOS/Linux:**
+```bash
+mkdir -p /opt/lampp/htdocs/mentorbridge-project-php/uploads
+chmod 777 /opt/lampp/htdocs/mentorbridge-project-php/uploads
+```
+
+---
+
+## How to Run the Project
+
+### Starting the Application
+
+1. **Ensure XAMPP Services are Running**
+   ```
+   ✓ Apache: Running (Port 80)
+   ✓ MySQL: Running (Port 3306)
+   ```
+
+2. **Access the Application**
+   - Open your web browser
+   - Navigate to one of the following URLs:
+     - `http://localhost/mentorbridge-project-php/`
+     - `http://127.0.0.1/mentorbridge-project-php/`
+   
+3. **Landing Page**
+   - You should see the MentorBridge landing page
+   - Modern purple gradient design with animated background
+   - Navigation options: Login, Register as Mentor, Register as Mentee
+
+### Login Credentials
+
+The database comes pre-loaded with sample accounts for testing:
+
+| Role | Email | Password | Description |
+|------|-------|----------|-------------|
+| **Admin** | `admin@mentorbridge.com` | `admin123` | Full platform access, approve mentors |
+| **Mentor** | `john.mentor@example.com` | `admin123` | Pre-approved mentor with sample profile |
+| **Mentee** | `jane.student@example.com` | `admin123` | Mentee with sample session history |
+
+### Navigation Flow
+
+**For Mentees:**
+1. Login → Mentee Dashboard
+2. Browse mentors by category
+3. View mentor profiles
+4. Book sessions based on availability
+5. View and manage sessions
+6. Complete payments
+7. Rate and review completed sessions
+
+**For Mentors:**
+1. Login → Mentor Dashboard (or Profile Setup if new)
+2. Complete profile (bio, skills, hourly rate, categories)
+3. Wait for admin approval
+4. Manage availability (add/remove time slots)
+5. View upcoming sessions
+6. Track earnings
+
+**For Admins:**
+1. Login → Admin Dashboard
+2. View pending mentor applications
+3. Approve/reject mentors
+4. Manage users (suspend/activate)
+5. View platform statistics
+
+### Platform-Specific Instructions
+
+#### Windows
+- Default installation works without modifications
+- Apache runs on port 80 (ensure Skype or IIS are not using port 80)
+- Access via: `http://localhost/mentorbridge-project-php/`
+
+#### macOS
+- XAMPP may require security permissions
+- Allow Apache in System Preferences → Security & Privacy
+- If port 80 is blocked, configure Apache to use port 8080:
+  - Edit `httpd.conf`
+  - Access via: `http://localhost:8080/mentorbridge-project-php/`
+
+#### Linux
+- XAMPP typically installed in `/opt/lampp/`
+- Start services: `sudo /opt/lampp/lampp start`
+- Grant permissions to uploads folder: `chmod 777 uploads/`
+- Access via: `http://localhost/mentorbridge-project-php/`
+
+---
+
+## Testing the Project
+
+### Automated Testing
+
+**Note:** This project currently does not include automated unit tests (PHPUnit) or integration tests. Testing is performed manually following the test scenarios below.
+
+**Assumption:** For production deployment, the following automated tests should be implemented:
+- PHPUnit tests for database operations
+- Selenium/Cypress for end-to-end UI testing
+- API endpoint testing (if REST API is added)
+
+### Manual Testing Instructions
+
+Comprehensive manual testing scenarios to validate all functionality.
+
+#### Test Scenario 1: User Registration & Authentication
+
+**Test Case 1.1: Mentee Registration**
+1. Navigate to `http://localhost/mentorbridge-project-php/`
+2. Click **"Join as Mentee"** button
+3. Fill in registration form:
+   - Full Name: `Test Mentee`
+   - Email: `testmentee@example.com`
+   - Password: `password123`
+   - Confirm Password: `password123`
+   - Role: Mentee (should be pre-selected)
+4. Click **"Register"** button
+
+**Expected Results:**
+- ✓ Redirect to Mentee Dashboard
+- ✓ Welcome message displayed
+- ✓ User email shown in header
+- ✓ New record in `users` table with role='mentee'
+- ✓ New record in `mentee_profiles` table
+
+**Test Case 1.2: Mentor Registration**
+1. Logout (if logged in)
+2. Navigate to homepage
+3. Click **"Become a Mentor"** button
+4. Fill in registration form:
+   - Full Name: `Test Mentor`
+   - Email: `testmentor@example.com`
+   - Password: `password123`
+   - Confirm Password: `password123`
+   - Role: Mentor (should be pre-selected)
+5. Click **"Register"** button
+
+**Expected Results:**
+- ✓ Redirect to Mentor Profile Setup page
+- ✓ Message: "Complete your profile to start mentoring"
+- ✓ Status: "Pending Approval"
+- ✓ New record in `mentor_profiles` with status='pending'
+
+**Test Case 1.3: Login Validation**
+1. Logout
+2. Navigate to Login page
+3. **Test Invalid Credentials:**
+   - Email: `invalid@test.com`
+   - Password: `wrongpassword`
+   - Expected: Error message "Invalid email or password"
+4. **Test Valid Credentials:**
+   - Email: `admin@mentorbridge.com`
+   - Password: `admin123`
+   - Expected: Redirect to Admin Dashboard
+
+**Test Case 1.4: Password Security**
+1. Go to Registration page
+2. Try password shorter than 6 characters: `12345`
+3. Expected: Error "Password must be at least 6 characters"
+
+#### Test Scenario 2: Mentor Profile Management
+
+**Test Case 2.1: Complete Mentor Profile**
+1. Login as mentor: `john.mentor@example.com` / `admin123`
+2. Navigate to Mentor Profile page
+3. Fill in/verify profile fields:
+   - Full Name: `John Smith`
+   - Bio: `Experienced developer...`
+   - Skills: `JavaScript, Python, React`
+   - Experience: `10 years as Senior Developer`
+   - Hourly Rate: `75.00`
+   - Categories: Select "Programming"
+4. Upload profile image (optional)
+5. Click **"Save Profile"** button
+
+**Expected Results:**
+- ✓ Success message: "Profile updated successfully"
+- ✓ Data saved in `mentor_profiles` table
+- ✓ Category association saved in `mentor_categories` table
+
+**Test Case 2.2: Admin Approval Workflow**
+1. Login as admin: `admin@mentorbridge.com` / `admin123`
+2. Navigate to Admin Dashboard
+3. Locate pending mentor in "Pending Approvals" section
+4. Click **"Approve"** button next to mentor
+
+**Expected Results:**
+- ✓ Mentor status changes from 'pending' to 'approved'
+- ✓ Mentor receives default availability slots (Mon-Fri, 9:00 AM)
+- ✓ Mentor can now manage availability
+- ✓ Mentor appears in public mentor listings
+
+**Test Case 2.3: Mentor Rejection**
+1. As admin, find a pending mentor
+2. Click **"Reject"** button
+
+**Expected Results:**
+- ✓ Mentor status changes to 'rejected'
+- ✓ Mentor cannot manage availability
+- ✓ Mentor does not appear in public listings
+
+#### Test Scenario 3: Mentor Availability Management
+
+**Test Case 3.1: Add Availability Slots**
+1. Login as approved mentor: `john.mentor@example.com` / `admin123`
+2. Navigate to **"Manage Availability"**
+3. Select day: `Monday`
+4. Select time: `14:00` (2:00 PM)
+5. Click **"Add Time Slot"** button
+
+**Expected Results:**
+- ✓ Success message: "Time slot added successfully"
+- ✓ New slot appears in Monday's availability
+- ✓ Record inserted in `mentor_availability` table
+- ✓ Slot is marked as available (green indicator)
+
+**Test Case 3.2: Slot Conflict Validation**
+1. Try adding another slot on Monday at `14:30`
+2. Expected: Error "Time slots must be at least 1 hour apart"
+
+**Test Case 3.3: Toggle Availability**
+1. Find an existing time slot
+2. Click **"Toggle"** button to disable it
+3. Expected: Slot grays out, `is_available` = 0
+4. Click **"Toggle"** again to enable
+5. Expected: Slot becomes green again, `is_available` = 1
+
+**Test Case 3.4: Delete Time Slot**
+1. Find an existing slot with no bookings
+2. Click **"Delete"** button
+3. Expected: Slot removed from list, deleted from database
+
+#### Test Scenario 4: Session Booking & Payment
+
+**Test Case 4.1: Browse Mentors**
+1. Login as mentee: `jane.student@example.com` / `admin123`
+2. From Mentee Dashboard, browse mentors
+3. Click on category filter (e.g., "Programming")
+4. Expected: Only mentors in that category are displayed
+
+**Test Case 4.2: View Mentor Details**
+1. Click on mentor card (e.g., "John Smith")
+2. Verify displayed information:
+   - Full name, bio, skills, experience
+   - Hourly rate (e.g., $75.00)
+   - Average rating (e.g., 4.8 ★)
+   - Total reviews count
+   - Available time slots organized by day
+
+**Test Case 4.3: Book a Session**
+1. On mentor detail page, scroll to "Available Time Slots"
+2. Select a day (e.g., `Monday`)
+3. Select a time slot (e.g., `09:00`)
+4. Click **"Book Session"** button
+5. Verify booking summary:
+   - Mentor rate: $75.00
+   - Platform fee (20%): $15.00
+   - **Total amount: $90.00**
+6. Click **"Confirm Booking"** button
+
+**Expected Results:**
+- ✓ Redirect to "My Sessions" page
+- ✓ Success message: "Session scheduled successfully! Please complete payment"
+- ✓ Session appears in "Pending" tab
+- ✓ Session record created with status='pending', payment_status='pending'
+- ✓ Time slot marked as unavailable in `mentor_availability`
+
+**Test Case 4.4: Complete Payment**
+1. In "My Sessions", find the pending session
+2. Click **"Pay Now"** button
+3. On payment page, verify session details
+4. Click **"Confirm Payment"** button
+
+**Expected Results:**
+- ✓ Success message: "Payment successful"
+- ✓ Session status changes to 'confirmed'
+- ✓ Payment status changes to 'paid'
+- ✓ Session moves to "Upcoming" tab
+
+#### Test Scenario 5: Session Completion & Feedback
+
+**Test Case 5.1: Complete a Session (Manual Database Update)**
+
+Since sessions are scheduled for future dates, manually update the database to simulate completion:
+
+1. Open PhpMyAdmin → `mentorbridge` → `sessions` table
+2. Find a confirmed session
+3. Click **"Edit"**
+4. Change:
+   - `status`: 'completed'
+   - `scheduled_at`: Set to a past date (e.g., yesterday)
+5. Click **"Go"** to save
+
+**Test Case 5.2: Submit Feedback**
+1. Login as mentee
+2. Navigate to **"My Sessions"** → **"Completed"** tab
+3. Find the completed session
+4. Click **"Rate Mentor"** button
+5. Select rating: 5 stars
+6. Enter comment: `Excellent mentor! Very knowledgeable and patient.`
+7. Click **"Submit Feedback"** button
+
+**Expected Results:**
+- ✓ Success message: "Thank you for your feedback"
+- ✓ Feedback record created in `feedback` table
+- ✓ Mentor's average rating recalculated (trigger fires)
+- ✓ Mentor's total reviews count incremented
+- ✓ Feedback button changes to "Rated" (disabled)
+
+**Test Case 5.3: View Feedback on Mentor Profile**
+1. Navigate to mentor's public profile
+2. Expected: Updated rating visible (e.g., 4.8 → 4.9)
+3. Expected: Review count increased
+4. Expected: Recent feedback visible (if display is implemented)
+
+#### Test Scenario 6: Admin Functions
+
+**Test Case 6.1: User Management**
+1. Login as admin: `admin@mentorbridge.com` / `admin123`
+2. Navigate to Admin Dashboard → **"All Users"** section
+3. Find a user
+4. Click **"Suspend"** button
+
+**Expected Results:**
+- ✓ User status changes to 'suspended'
+- ✓ User cannot login (error: "Your account has been suspended")
+
+**Test Case 6.2: Activate Suspended User**
+1. As admin, find suspended user
+2. Click **"Activate"** button
+3. Expected: Status changes to 'active', user can login
+
+**Test Case 6.3: View Platform Statistics**
+1. As admin, view dashboard metrics:
+   - Total users count
+   - Total mentors (approved/pending/rejected)
+   - Total mentees
+   - Total sessions (pending/confirmed/completed)
+   - Platform revenue (20% of all paid sessions)
+
+#### Test Scenario 7: Edge Cases & Error Handling
+
+**Test Case 7.1: Duplicate Email Registration**
+1. Try registering with existing email: `admin@mentorbridge.com`
+2. Expected: Error "Email already registered"
+
+**Test Case 7.2: Book Already Booked Slot**
+1. As mentee, try booking a slot that's already booked
+2. Expected: Slot should not be visible (filtered out)
+
+**Test Case 7.3: Access Control**
+1. Logout
+2. Try accessing: `http://localhost/mentorbridge-project-php/admin-dashboard.php`
+3. Expected: Redirect to login page
+4. Login as mentee
+5. Try accessing admin dashboard again
+6. Expected: Redirect to mentee dashboard (role-based access control)
+
+**Test Case 7.4: SQL Injection Prevention**
+1. On login page, try SQL injection:
+   - Email: `admin' OR '1'='1`
+   - Password: `anything`
+2. Expected: Error "Invalid email or password" (prepared statements prevent injection)
+
+**Test Case 7.5: Empty Form Submission**
+1. On any form, leave all fields empty
+2. Click submit
+3. Expected: Validation error messages displayed
+
+### Expected Test Results Summary
+
+| Test Area | Total Test Cases | Expected Pass Rate |
+|-----------|------------------|-------------------|
+| Authentication | 4 | 100% |
+| Mentor Profile | 3 | 100% |
+| Availability | 4 | 100% |
+| Session Booking | 4 | 100% |
+| Feedback | 3 | 100% |
+| Admin Functions | 3 | 100% |
+| Edge Cases | 5 | 100% |
+| **TOTAL** | **26** | **100%** |
+
+---
+
+## Project Structure
+
+```
+mentorbridge-project-php/
+│
+├── config.php                  # Database configuration & helper functions
+├── database.sql                # Complete database schema with sample data
+├── index.php                   # Landing page (homepage)
+├── login.php                   # Login page for all users
+├── register.php                # Registration page (mentor/mentee)
+├── logout.php                  # Logout handler
+├── dashboard.php               # Main dashboard router (role-based redirect)
+│
+├── admin-dashboard.php         # Admin control panel
+│   ├── View all users
+│   ├── Approve/reject mentors
+│   ├── Suspend/activate users
+│   └── Platform statistics
+│
+├── mentor-dashboard.php        # Mentor home page
+├── mentor-profile.php          # Mentor profile creation/editing
+├── manage-availability.php     # Mentor availability management
+│
+├── mentee-dashboard.php        # Mentee home page (browse mentors)
+├── mentor-detail.php           # Public mentor profile view
+├── metnor-detail.php           # (Typo - same as mentor-detail.php)
+├── book-session.php            # Session booking & payment
+├── my-sessions.php             # View upcoming/past sessions
+├── payment.php                 # Payment processing page
+│
+├── uploads/                    # Directory for user-uploaded files
+│   └── (profile images, documents)
+│
+├── README.md                   # This file - project documentation
+└── .git/                       # Git version control (optional)
+```
+
+### Key Files Explained
+
+#### Configuration & Core
+- **config.php**: Database connection settings, session management, authentication helpers (`isLoggedIn()`, `requireRole()`), and input sanitization functions
+
+#### Database
+- **database.sql**: Complete database schema including:
+  - 8 tables (users, mentor_profiles, mentee_profiles, categories, sessions, etc.)
+  - Indexes for performance optimization
+  - Triggers for auto-updating ratings and creating default availability
+  - Views for session overview and mentor statistics
+  - Sample data for testing (3 users, 10 categories, 1 session)
+
+#### Public Pages
+- **index.php**: Landing page with modern UI, category showcase, and call-to-action buttons
+- **login.php**: Authentication page with error handling and session creation
+- **register.php**: Role-based registration with form validation
+
+#### Mentor Pages
+- **mentor-dashboard.php**: Mentor home showing sessions, earnings, and quick stats
+- **mentor-profile.php**: Profile editor for bio, skills, hourly rate, and categories
+- **manage-availability.php**: Weekly schedule manager with add/delete/toggle functionality
+
+#### Mentee Pages
+- **mentee-dashboard.php**: Browse mentors by category, search functionality
+- **mentor-detail.php / metnor-detail.php**: Detailed mentor view with booking interface
+- **book-session.php**: Session booking with date/time selection and price calculation
+- **my-sessions.php**: Session history (upcoming, pending, completed)
+- **payment.php**: Payment confirmation page
+
+#### Admin Pages
+- **admin-dashboard.php**: Centralized admin control panel for platform management
+
+---
+
+## Configuration
+
+### Database Configuration
+
+Edit `config.php` to customize database connection:
+
+```php
+// Database credentials
+define('DB_HOST', 'localhost');      // MySQL host (default: localhost)
+define('DB_NAME', 'mentorbridge');   // Database name
+define('DB_USER', 'root');           // MySQL username (default: root)
+define('DB_PASS', '');               // MySQL password (empty for XAMPP)
+```
+
+**Custom Port Configuration:**
+If MySQL runs on a non-standard port (e.g., 3307):
+```php
+define('DB_HOST', 'localhost:3307');
+```
+
+### Session Configuration
+
+Sessions are configured in `config.php` with `session_start()`. Default session settings:
+- Session timeout: PHP default (24 minutes of inactivity)
+- Session storage: Server filesystem
+- Session cookie: `PHPSESSID`
+
+**To modify session timeout**, add to `config.php`:
+```php
+ini_set('session.gc_maxlifetime', 3600);  // 1 hour in seconds
+session_set_cookie_params(3600);           // 1 hour
+```
+
+### File Upload Configuration
+
+**Upload Directory:** `uploads/` (must have write permissions)
+
+**Supported File Types (Profile Images):**
+- JPEG/JPG
+- PNG
+- GIF
+
+**Maximum File Size:**
+Default PHP settings apply (usually 2MB). To increase:
+
+Edit `php.ini` (located in `C:\xampp\php\php.ini`):
+```ini
+upload_max_filesize = 10M
+post_max_size = 10M
+```
+
+Restart Apache after changes.
+
+### Environment Variables
+
+This project uses PHP constants instead of environment variables. For production deployment, consider using `.env` files with:
+
+```env
+DB_HOST=localhost
+DB_NAME=mentorbridge
+DB_USER=root
+DB_PASS=your_password
+APP_ENV=production
+APP_DEBUG=false
+```
+
+And load with `vlucas/phpdotenv` library.
+
+### Time Zone Configuration
+
+Default: Server timezone (PHP default)
+
+To set explicitly, add to `config.php`:
+```php
+date_default_timezone_set('America/New_York');  // Change as needed
+```
+
+---
+
+## Common Issues & Troubleshooting
+
+### Issue 1: "Database connection failed"
+
+**Symptoms:**
+- Error message on page load: "Database connection failed: Connection refused"
+- Cannot access any page
+
+**Solutions:**
+1. **Verify MySQL is running:**
+   - Open XAMPP Control Panel
+   - Check MySQL status shows "Running"
+   - If not, click "Start"
+
+2. **Check database credentials in `config.php`:**
+   ```php
+   define('DB_USER', 'root');    // Default XAMPP username
+   define('DB_PASS', '');        // Default XAMPP has no password
+   ```
+
+3. **Verify database exists:**
+   - Open PhpMyAdmin: `http://localhost/phpmyadmin`
+   - Check if `mentorbridge` database exists
+   - If not, re-import `database.sql`
+
+4. **Check MySQL port:**
+   - Default port: 3306
+   - If changed, update `config.php`: `define('DB_HOST', 'localhost:3307');`
+
+### Issue 2: "Access forbidden" or Apache 403 Error
+
+**Symptoms:**
+- 403 Forbidden error when accessing project
+- "You don't have permission to access this resource"
+
+**Solutions:**
+1. **Check Apache is running:**
+   - XAMPP Control Panel → Apache should show "Running"
+
+2. **Verify project path:**
+   - Ensure project is in `htdocs` folder
+   - Correct: `C:\xampp\htdocs\mentorbridge-project-php\`
+   - Wrong: `C:\Users\Desktop\mentorbridge-project-php\`
+
+3. **Check file permissions (Linux/macOS):**
+   ```bash
+   chmod -R 755 /opt/lampp/htdocs/mentorbridge-project-php
+   ```
+
+### Issue 3: Port 80 Already in Use
+
+**Symptoms:**
+- Apache fails to start
+- Error: "Port 80 in use by another application"
+
+**Common Conflicts:**
+- Skype (Windows)
+- IIS (Windows)
+- Other web servers
+
+**Solutions:**
+
+**Option A: Stop conflicting application**
+- Windows: Stop IIS or Skype
+- Disable Skype's use of port 80/443 in Settings
+
+**Option B: Change Apache port**
+1. In XAMPP, click "Config" next to Apache → `httpd.conf`
+2. Find line: `Listen 80`
+3. Change to: `Listen 8080`
+4. Save and restart Apache
+5. Access via: `http://localhost:8080/mentorbridge-project-php/`
+
+### Issue 4: Blank White Page
+
+**Symptoms:**
+- Page loads but shows nothing (blank white screen)
+- No error messages visible
+
+**Solutions:**
+1. **Enable PHP error display:**
+   
+   Add to `config.php` (top of file):
+   ```php
+   error_reporting(E_ALL);
+   ini_set('display_errors', 1);
+   ```
+
+2. **Check PHP error log:**
+   - Location: `C:\xampp\apache\logs\error.log`
+   - Look for recent PHP errors
+
+3. **Verify PHP version:**
+   - Create `info.php` with: `<?php phpinfo(); ?>`
+   - Access: `http://localhost/mentorbridge-project-php/info.php`
+   - Verify PHP version is 7.4+
+
+### Issue 5: "Session already started" Warning
+
+**Symptoms:**
+- Warning: "session_start(): A session had already been started"
+
+**Solution:**
+- This is normal if `config.php` is included multiple times
+- Modify `config.php` to add check:
+  ```php
+  if (session_status() === PHP_SESSION_NONE) {
+      session_start();
+  }
+  ```
+
+### Issue 6: "Cannot modify header information" Error
+
+**Symptoms:**
+- Warning: "Cannot modify header information - headers already sent"
+- Occurs during redirects
+
+**Causes:**
+- Whitespace before `<?php` tag
+- Output (echo/print) before redirect
+
+**Solutions:**
+1. Remove any whitespace before `<?php` in files
+2. Ensure no `echo` statements before `header()` calls
+3. Use output buffering in `config.php`:
+   ```php
+   ob_start();  // Add at top of config.php
+   ```
+
+### Issue 7: Upload Directory Not Writable
+
+**Symptoms:**
+- Profile image upload fails
+- Error: "Failed to move uploaded file"
+
+**Solutions:**
+
+**Windows:**
+```cmd
+# Open Command Prompt as Administrator
+icacls "C:\xampp\htdocs\mentorbridge-project-php\uploads" /grant Everyone:F
+```
+
+**Linux/macOS:**
+```bash
+chmod 777 /opt/lampp/htdocs/mentorbridge-project-php/uploads
+```
+
+### Issue 8: Google Fonts Not Loading
+
+**Symptoms:**
+- Page uses default fonts instead of Inter
+- Fonts look different than expected
+
+**Solutions:**
+1. Check internet connection (fonts load from Google CDN)
+2. If offline, download fonts and host locally:
+   - Download Inter font from Google Fonts
+   - Place in `assets/fonts/` directory
+   - Update CSS to use local fonts
+
+### Issue 9: Login Redirects to Blank Page
+
+**Symptoms:**
+- After login, redirected to blank page or error
+
+**Solution:**
+1. Check if `dashboard.php` exists
+2. Verify user role in database matches expected values ('mentor', 'mentee', 'admin')
+3. Clear browser cache and cookies
+4. Check session configuration in `php.ini`
+
+### Issue 10: Database Import Fails
+
+**Symptoms:**
+- PhpMyAdmin shows error during import
+- Error: "Unknown column" or "Table already exists"
+
+**Solutions:**
+1. **Drop existing database first:**
+   - In PhpMyAdmin, select `mentorbridge` database
+   - Click "Drop" tab → Confirm
+   - Re-import `database.sql`
+
+2. **Check SQL mode:**
+   - In PhpMyAdmin, go to Variables tab
+   - Search for `sql_mode`
+   - If strict, may cause issues with default values
+
+3. **Import in smaller chunks:**
+   - Copy portions of `database.sql`
+   - Execute in SQL tab separately
+
+---
+
+## Assumptions & Limitations
+
+### Assumptions
+
+1. **Development Environment:**
+   - This project is designed for local development using XAMPP
+   - Not configured for production deployment without modifications
+   - Assumes default XAMPP configuration (root user, no password)
+
+2. **User Behavior:**
+   - Users will use modern web browsers with JavaScript enabled
+   - Users have stable internet connection (for Google Fonts)
+   - Mentees understand the 20% platform fee model
+   - Mentors will set realistic hourly rates
+
+3. **Data Validation:**
+   - Assumes users will input reasonable data
+   - Email addresses are valid (no email verification implemented)
+   - Users will not attempt malicious SQL injection (mitigated with prepared statements)
+
+4. **Session Scheduling:**
+   - Sessions are 60 minutes duration by default
+   - Time slots are booked one week in advance
+   - Mentors are available for the full hour of booked slot
+
+5. **Payment Processing:**
+   - Payment system is simulated (no real payment gateway integration)
+   - Payment confirmation is instant and manual
+   - No refund processing implemented
+
+### Current Limitations
+
+#### 1. **Authentication & Security**
+- ❌ No email verification after registration
+- ❌ No password reset/recovery functionality
+- ❌ No two-factor authentication (2FA)
+- ❌ Password hashing uses bcrypt (good) but no advanced security features
+- ❌ No CSRF token protection on forms
+- ❌ Session hijacking protection not implemented
+
+#### 2. **Payment System**
+- ❌ No real payment gateway integration (Stripe, PayPal, etc.)
+- ❌ Payment is simulated with button click
+- ❌ No transaction history/invoices
+- ❌ No refund mechanism
+- ❌ No escrow system (mentors can't withdraw earnings)
+
+#### 3. **Notification System**
+- ❌ No email notifications for:
+  - Registration confirmation
+  - Session booking confirmation
+  - Session reminders
+  - Mentor approval/rejection
+- ❌ No in-app notifications
+- ❌ No SMS notifications
+
+#### 4. **Search & Filtering**
+- ❌ Limited search functionality (only category-based filtering)
+- ❌ No keyword search for mentor skills
+- ❌ No advanced filters (price range, rating, availability)
+- ❌ No sorting options (by rating, price, reviews)
+
+#### 5. **Session Management**
+- ❌ No video conferencing integration (Zoom, Google Meet)
+- ❌ No calendar integration (Google Calendar, iCal)
+- ❌ No session rescheduling functionality
+- ❌ No session cancellation with automatic refund
+- ❌ Sessions cannot exceed or be less than 60 minutes
+
+#### 6. **User Interface**
+- ❌ Not fully responsive on all mobile devices
+- ❌ No dark mode option
+- ❌ No accessibility features (screen reader support, keyboard navigation)
+- ❌ No internationalization (English only)
+
+#### 7. **Data & Analytics**
+- ❌ Limited admin analytics
+- ❌ No mentor earnings dashboard
+- ❌ No revenue reports
+- ❌ No data export functionality (CSV, PDF)
+
+#### 8. **File Upload**
+- ❌ Profile images only (no document uploads)
+- ❌ No image resizing/optimization
+- ❌ No file type validation (security risk)
+- ❌ No maximum file size enforcement in code
+
+#### 9. **Testing**
+- ❌ No automated unit tests
+- ❌ No integration tests
+- ❌ No end-to-end tests
+- ❌ Only manual testing documented
+
+#### 10. **Scalability**
+- ❌ Not optimized for large user bases (10,000+ users)
+- ❌ No caching layer (Redis, Memcached)
+- ❌ No CDN for static assets
+- ❌ Sessions stored in filesystem (not database)
+
+### Known Issues
+
+1. **Typo in filename:** `metnor-detail.php` should be `mentor-detail.php`
+2. **Mixed session status:** Database trigger creates default availability but UI doesn't always reflect immediately
+3. **Time zone handling:** Uses server timezone, may cause booking conflicts across time zones
+4. **Concurrent bookings:** Rare race condition if two mentees book same slot simultaneously
+
+### Not Covered
+
+- Real-time chat between mentor and mentee
+- Video/audio call functionality
+- Mobile application (iOS/Android)
+- API for third-party integrations
+- Multi-language support
+- Advanced reporting and analytics
+- Automated mentor verification (background checks)
+- Dispute resolution system
+- Subscription plans for mentees or mentors
+
+---
+
+## How to Evaluate / Grade / Validate the Project
+
+This section provides a comprehensive evaluation guide for instructors, testers, and evaluators.
+
+### Evaluation Checklist
+
+#### Phase 1: Setup & Configuration (15 points)
+
+| Task | Points | Verification Steps |
+|------|--------|-------------------|
+| XAMPP installation successful | 3 | Apache and MySQL running in XAMPP |
+| Database imported correctly | 4 | 8 tables exist, sample data loaded |
+| Application accessible | 3 | Landing page loads at localhost |
+| No critical errors on load | 3 | No PHP errors, database connected |
+| Configuration correct | 2 | config.php has valid credentials |
+
+**Validation Steps:**
+1. Open XAMPP Control Panel → Verify Apache & MySQL are running
+2. Access PhpMyAdmin → Verify `mentorbridge` database exists
+3. Navigate to `http://localhost/mentorbridge-project-php/`
+4. Verify homepage loads without errors
+
+---
+
+#### Phase 2: User Authentication (20 points)
+
+| Functionality | Points | How to Verify |
+|--------------|--------|---------------|
+| User registration (mentee) | 5 | Register new mentee, verify in database |
+| User registration (mentor) | 5 | Register new mentor, check status=pending |
+| Login functionality | 4 | Login with sample accounts |
+| Logout functionality | 2 | Logout, verify redirect to login |
+| Role-based access control | 4 | Try accessing admin page as mentee |
+
+**Validation Steps:**
+1. **Register as Mentee:**
+   - Click "Join as Mentee" → Fill form → Submit
+   - ✓ Check: Redirected to dashboard
+   - ✓ Check: Record in `users` and `mentee_profiles` tables
+
+2. **Register as Mentor:**
+   - Click "Become a Mentor" → Fill form → Submit
+   - ✓ Check: Profile status = 'pending'
+   - ✓ Check: Cannot manage availability yet
+
+3. **Login Test:**
+   - Use: `admin@mentorbridge.com` / `admin123`
+   - ✓ Check: Redirected to admin dashboard
+
+4. **Access Control:**
+   - Login as mentee
+   - Try: `http://localhost/mentorbridge-project-php/admin-dashboard.php`
+   - ✓ Check: Redirected away (not authorized)
+
+---
+
+#### Phase 3: Mentor Management (20 points)
+
+| Functionality | Points | How to Verify |
+|--------------|--------|---------------|
+| Mentor profile creation | 5 | Complete profile with bio, skills, rate |
+| Admin approval workflow | 5 | Admin can approve/reject mentors |
+| Availability management | 6 | Add/delete/toggle time slots |
+| Category assignment | 4 | Mentors assigned to correct categories |
+
+**Validation Steps:**
+1. **Profile Creation:**
+   - Login as: `john.mentor@example.com` / `admin123`
+   - Navigate to Mentor Profile
+   - ✓ Verify all fields editable: bio, skills, experience, rate
+   - ✓ Update and save → Check database for changes
+
+2. **Approval Process:**
+   - Login as admin
+   - Find pending mentor
+   - Click "Approve"
+   - ✓ Check: Status changes to 'approved' in database
+   - ✓ Check: Mentor can now access availability management
+
+3. **Availability Slots:**
+   - As approved mentor, go to "Manage Availability"
+   - Add slot: Monday, 14:00
+   - ✓ Check: Slot appears in list
+   - ✓ Check: Record in `mentor_availability` table
+   - Toggle availability
+   - ✓ Check: `is_available` changes in database
+   - Delete slot
+   - ✓ Check: Record removed
+
+4. **Categories:**
+   - Edit mentor profile
+   - Select "Programming" and "Mathematics"
+   - ✓ Check: `mentor_categories` table has 2 records
+
+---
+
+#### Phase 4: Session Booking (25 points)
+
+| Functionality | Points | How to Verify |
+|--------------|--------|---------------|
+| Browse mentors | 4 | Filter by category, view mentor list |
+| View mentor details | 4 | See full profile, ratings, availability |
+| Book session | 8 | Select slot, create booking |
+| Payment processing | 5 | Simulate payment, status updates |
+| Session appears in history | 4 | View in "My Sessions" |
+
+**Validation Steps:**
+1. **Browse Functionality:**
+   - Login as: `jane.student@example.com` / `admin123`
+   - On Mentee Dashboard, click "Programming" category
+   - ✓ Check: Only programming mentors displayed
+
+2. **Mentor Profile View:**
+   - Click on mentor card (John Smith)
+   - ✓ Verify displays: bio, skills, rate, rating, availability slots
+
+3. **Booking Process:**
+   - Select available slot: Monday, 09:00
+   - Click "Book Session"
+   - ✓ Check calculation:
+     - Mentor rate: $75.00
+     - Platform fee (20%): $15.00
+     - Total: $90.00
+   - Confirm booking
+   - ✓ Check: Record in `sessions` table with status='pending'
+
+4. **Payment:**
+   - In "My Sessions", find pending session
+   - Click "Pay Now" → Confirm Payment
+   - ✓ Check: `payment_status` = 'paid'
+   - ✓ Check: `status` = 'confirmed'
+
+5. **Session History:**
+   - Navigate to "My Sessions"
+   - ✓ Check: Session appears in "Upcoming" tab
+   - ✓ Verify: Correct mentor, date, time, amount
+
+---
+
+#### Phase 5: Feedback & Rating (10 points)
+
+| Functionality | Points | How to Verify |
+|--------------|--------|---------------|
+| Submit rating | 5 | Rate completed session (1-5 stars) |
+| Rating calculation | 3 | Mentor's average rating updates |
+| Feedback display | 2 | Feedback visible on mentor profile |
+
+**Validation Steps:**
+1. **Mark Session Complete (Database):**
+   - PhpMyAdmin → `sessions` table
+   - Edit a confirmed session
+   - Set `status` = 'completed', `scheduled_at` = yesterday's date
+   - Save
+
+2. **Submit Feedback:**
+   - Login as mentee
+   - "My Sessions" → "Completed" tab
+   - Click "Rate Mentor"
+   - Select 5 stars
+   - Comment: "Excellent mentor!"
+   - Submit
+   - ✓ Check: Record in `feedback` table
+
+3. **Rating Update:**
+   - Query `mentor_profiles` table
+   - ✓ Verify: `average_rating` updated
+   - ✓ Verify: `total_reviews` incremented
+   - View mentor's public profile
+   - ✓ Check: New rating displayed
+
+---
+
+#### Phase 6: Admin Functions (10 points)
+
+| Functionality | Points | How to Verify |
+|--------------|--------|---------------|
+| View all users | 2 | List displays mentors, mentees |
+| Approve/reject mentors | 4 | Change mentor status |
+| Suspend/activate users | 3 | Toggle user account status |
+| View statistics | 1 | Dashboard shows counts |
+
+**Validation Steps:**
+1. **User Management:**
+   - Login as: `admin@mentorbridge.com` / `admin123`
+   - Admin Dashboard → "All Users"
+   - ✓ Verify: List shows all registered users
+
+2. **Mentor Approval:**
+   - Find pending mentor
+   - Click "Approve"
+   - ✓ Check: Mentor status = 'approved'
+   - Click "Reject" on another
+   - ✓ Check: Mentor status = 'rejected'
+
+3. **Account Suspension:**
+   - Find active user
+   - Click "Suspend"
+   - ✓ Check: `status` = 'suspended' in database
+   - Logout and try logging in as suspended user
+   - ✓ Check: Error "Your account has been suspended"
+   - Login as admin again, click "Activate"
+   - ✓ Check: User can login again
+
+4. **Statistics:**
+   - View admin dashboard
+   - ✓ Verify counts displayed:
+     - Total users
+     - Total mentors (by status)
+     - Total sessions
+     - Platform revenue
+
+---
+
+### Grading Rubric Summary
+
+| Category | Max Points | Focus Areas |
+|----------|-----------|-------------|
+| Setup & Configuration | 15 | Installation, database, no errors |
+| Authentication | 20 | Register, login, access control |
+| Mentor Management | 20 | Profile, approval, availability |
+| Session Booking | 25 | Browse, book, payment flow |
+| Feedback System | 10 | Rating, calculation, display |
+| Admin Functions | 10 | User management, approvals |
+| **TOTAL** | **100** | |
+
+### Bonus Points (Optional, +10)
+
+| Feature | Points | Criteria |
+|---------|--------|----------|
+| Code quality | 3 | Clean, commented, organized |
+| UI/UX design | 3 | Modern, intuitive, responsive |
+| Error handling | 2 | Graceful error messages |
+| Security practices | 2 | Prepared statements, sanitization |
+
+### Minimum Passing Criteria
+
+To pass evaluation:
+- ✓ Application runs without critical errors
+- ✓ Database properly configured
+- ✓ Users can register and login
+- ✓ Mentees can book sessions
+- ✓ Admin can manage users
+- **Minimum score: 70/100**
+
+### Critical Issues (Auto-Fail)
+
+- ❌ Application doesn't run at all
+- ❌ Database connection fails
+- ❌ SQL injection vulnerabilities present (test basic injection)
+- ❌ Severe security flaws (passwords stored in plaintext)
+
+---
+
+## Quick Start Summary
+
+**For the impatient evaluator:**
+
+```bash
+# 1. Start XAMPP
+Open XAMPP Control Panel → Start Apache & MySQL
+
+# 2. Import Database
+http://localhost/phpmyadmin → Import → database.sql
+
+# 3. Access Application
+http://localhost/mentorbridge-project-php/
+
+# 4. Test Login
+Admin: admin@mentorbridge.com / admin123
+Mentor: john.mentor@example.com / admin123
+Mentee: jane.student@example.com / admin123
+```
+
+**5-Minute Test:**
+1. Login as mentee → Browse mentors → View profile → Book session → Pay
+2. Login as admin → Approve pending mentor → View users
+3. Login as mentor → Add availability slot → View sessions
+
+---
+
+## Support & Contact
+
+For technical issues or questions about this project:
+
+- **Email**: (Add your instructor's email or your email)
+- **Course**: (Add course name/code)
+- **Semester**: (Add semester)
+- **University**: (Add university name)
+
+---
+
+## License
+
+This project is developed for educational purposes as part of a university course assignment.
+
+© 2026 MentorBridge Project. All rights reserved.
+
+---
+
+**Last Updated:** January 12, 2026  
+**Version:** 1.0  
+**Author:** (Add your name)
